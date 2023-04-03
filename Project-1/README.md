@@ -29,7 +29,7 @@ I am having trouble passing all the autograder test cases. I am passing only ele
 # resolved issue
 In the **adventure.py** function, Initially I was using end in print function to print the output without generating new line. but because of this at the end of printing line I was having extra space, which made autograder fail my all test cases, after a while of debugging I realized my mistake. And then I used join function of string to get my desired string and then printed that to get accurate answer.
 
-# Implemented extensions
+# Implemented extensions ----please use readme file from my gradescope submission, here it changes formate of code I pasted for guidance of these extensions.
 # 1) drop
 The drop extension is designed to provide players with the ability to remove items from their inventory. This can be useful in situations where the player no longer needs the item or wants to free up space in their inventory. The drop extension is described as the opposite of the "get" functionality, which is typically used to add items to a player's inventory. The drop extension, on the other hand, allows the player to remove items from their inventory.
 Before an item can be dropped, it needs to be in the player's inventory. If it does not exist in their inventory, the drop command will promp appropriate message that player is not carrying that item.
