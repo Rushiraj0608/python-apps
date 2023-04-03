@@ -1,0 +1,105 @@
+[
+  {
+    "name": "A white room",
+    "desc": "You are in a simple room with white walls.",
+    "exits": {
+      "north": 1,
+      "east": 3
+    },
+    "items":["efude","aisukyubutorei","hanga","ito","amerika","yokitori","ramen","tempura","katana","shuriken","kunai","jaberin"],
+    "itemsByCategory": [
+      {"japanese":{
+        "weapons":{
+          "english":["sword","ninja blades","dagger","javelin"],
+          "japanese":["katana","shuriken","kunai","jaberin"]
+        },
+        "foodItems":{
+          "english":["rice","japanese skewers","noodle dish","fritters"],
+          "japanese":["amerika","yokitori","ramen","tempura"]
+        },
+        "randomItems":{
+          "english":["paint brush","ice cube tray","hanger","thread"],
+          "japanese":["efude","aisukyubutorei","hanga","ito"]
+        }
+        }
+      }
+      ]
+  },
+  {
+    "name": "A blue room",
+    "desc": "This room is simple, too, but with blue walls.",
+    "exits": {
+      "east": 2,
+      "south": 0
+    },
+    "items":["malaking-lubid","mga-proteksiyon-na-suite","kahon","banga","abodo","pancit-palabok","arroz-caldo","kare-kare","itak-tagalog","hagibis","karambit","tanto"],
+    "itemsByCategory": [
+      {"filipino":{
+        "weapons":{
+          "english":["traditional sword","dagger","knife","Long knife"],
+          "filipino":["itak-tagalog","hagibis","karambit","tanto"]
+        },
+        "foodItems":{
+          "english":["dry rosted meat curry","noodle dish","soup","stew"],
+          "filipino":["abodo","pancit-palabok","arroz-caldo","kare-kare"]
+        },
+        "randomItems":{
+          "english":["big rope","protective suite","box","jar"],
+          "filipino":["malaking-lubid","mga-proteksiyon-na-suite","kahon","banga"]
+        }
+      }}
+      ]
+  },
+  {
+    "name": "A green room",
+    "desc": "You are in a simple room, with bright green walls.",
+    "exits": {
+      "west": 1,
+      "south": 3
+    },
+    "items": ["talwar","chappu","gada","trishul","katri","safarjan","khichdi","kelu","dakan-ni-ulti","pustak","ghadi"],
+    "itemsByCategory": [
+      {"gujarati":{
+        "weapons":{
+          "english":["sword","dagger","mace","trident"],
+          "gujarati":["talwar","chappu","gada","trishul"]
+        },
+        "foodItems":{
+          "english":["Chips","apple","hotchpotch","banana"],
+          "gujarati":["katri","safarjan","khichdi","kelu"]
+        },
+        "randomItems":{
+          "english":["witch's vomit","clock","book"],
+          "gujarati":["dakan-ni-ulti","ghadi","pustak"]
+        }
+        }
+      }]},
+
+  {
+    "name": "A red room",
+    "desc": "This room is fancy. It's red!",
+    "exits": {
+      "north": 2,
+      "west": 0
+    },
+    "items": [
+      "brot","eintopf","brezel","schwarzwalder-kirschtorte","riesiger-abfallbeutel-fur-haustiere","schutzmaske","geheimer-schlussel","schnurrbart-hitlers","riesiger-haustierabfallbeutel","keule","dreizack"
+    ],
+    "itemsByCategory": [
+        {"german":{
+        "weapons":{
+          "english":["pet waste bag launcher","mace","trident"],
+          "german":["riesiger-haustierabfallbeutel","keule","dreizack"]
+        },
+        "foodItems":{
+          "english":["bread","one-pot-stew","baked dough","cake"],
+          "german":["brot","eintopf","brezel","schwarzwalder-kirschtorte"]
+        },
+        "randomItems":{
+          "english":["Giant pet waste bag","protective mask","secret key","mustache of hitler"],
+          "german":["riesiger-abfallbeutel-fur-haustiere","schutzmaske","geheimer-schlussel","schnurrbart-hitlers"]
+        }
+  }} ]
+      }
+  
+]
