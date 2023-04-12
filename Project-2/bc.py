@@ -91,6 +91,19 @@ def lex(s: str) -> list[token]:
     return tokens
 
 
+# PARSING
+
+class ast():
+    typ: str
+    children: tuple[Any, ...]
+
+    def __init__(self, typ: str, *children: Any):
+        self.typ = typ
+        self.children = children
+
+    def __repr__(self):
+        return f'ast({self.typ!r}, {", ".join([repr(c) for c in self.children])})'
+
 # INTERPRETER
 
 def interp(a: ast, env: set[str]) -> bool:
