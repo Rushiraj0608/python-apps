@@ -1,8 +1,23 @@
-
-
 # LEXING
 
 from typing import Any
+
+
+with open("input.txt") as file:
+    lines = [line.rstrip() for line in file]
+
+for i in range(len(lines)):
+    if '#' in lines[i]:
+        lines[i] = lines[i].split('#', 1)[0]
+    if '/*' in lines[i]:
+        lines[i] = lines[i].split('/*', 1)[0]
+        for j in range(i,len(lines)):
+            if '*/' in lines[i]:
+                lines[i] = lines[i].split('/*', 1)[1]
+            else:
+                lines.remove(lines[i])
+
+    
 
 
 class token():
@@ -76,6 +91,12 @@ def lex(s: str) -> list[token]:
         elif s[i:i+1] == '/':
             tokens.append(token('opr', '/'))
             i += 1
+        elif s[i:i+1] == '%':
+            tokens.append(token('opr', '%'))
+            i += 1
+        elif s[i:i+1] == '^':
+            tokens.append(token('opr', '^'))
+            i += 1
         elif s[i:i+2] == '++':
             tokens.append(token('un', '++'))
             i += 2
@@ -84,6 +105,51 @@ def lex(s: str) -> list[token]:
             i += 2
         elif s[i:i+1] == '=':
             tokens.append(token('asg', '='))
+            i += 1
+        elif s[i:i+2] == '+=':
+            tokens.append(token('opeq', '+='))
+            i += 2
+        elif s[i:i+2] == '-=':
+            tokens.append(token('opeq', '-='))
+            i += 2
+        elif s[i:i+2] == '*=':
+            tokens.append(token('opeq', '*='))
+            i += 2
+        elif s[i:i+2] == '/=':
+            tokens.append(token('opeq', '/='))
+            i += 2
+        elif s[i:i+2] == '%=':
+            tokens.append(token('opeq', '%='))
+            i += 2
+        elif s[i:i+2] == '^=':
+            tokens.append(token('opeq', '^='))
+            i += 2
+        elif s[i:i+2] == '||':
+            tokens.append(token('sym', '||'))
+            i += 2
+        elif s[i:i+2] == '&&':
+            tokens.append(token('sym', '&&'))
+            i += 2
+        elif s[i] == '!':
+            tokens.append(token('sym', '!'))
+            i += 1
+        elif s[i:i+2] == '==':
+            tokens.append(token('relop', '=='))
+            i += 2
+        elif s[i:i+2] == '<=':
+            tokens.append(token('relop', '<='))
+            i += 2
+        elif s[i:i+2] == '>=':
+            tokens.append(token('relop', '>='))
+            i += 2
+        elif s[i:i+2] == '!=':
+            tokens.append(token('relop', '!='))
+            i += 2
+        elif s[i:i+1] == '>':
+            tokens.append(token('relop', '>'))
+            i += 1
+        elif s[i:i+1] == '<':
+            tokens.append(token('relop', '<'))
             i += 1
         else:
             raise SyntaxError(f'unexpected character {s[i]}')
@@ -122,10 +188,44 @@ def interp(a: ast, env: set[str]) -> bool:
             return interp(a.children[0], env) * interp(a.children[1], env)
         elif a.typ == '/':
             return interp(a.children[0], env) / interp(a.children[1], env)
+        elif a.typ == '%':
+            return interp(a.children[0], env) % interp(a.children[1], env)
+        elif a.typ == '^':
+            return interp(a.children[0], env) ^ interp(a.children[1], env)
         elif a.typ == '--':
             return interp(a.children[0], env)-1
         elif a.typ == '++':
             return interp(a.children[0], env)+1
+        elif a.typ == '+=':
+            return interp(a.children[0], env) + interp(a.children[1], env)
+        elif a.typ == '-=':
+            return interp(a.children[0], env) - interp(a.children[1], env)
+        elif a.typ == '*=':
+            return interp(a.children[0], env) * interp(a.children[1], env)
+        elif a.typ == '/=':
+            return interp(a.children[0], env) / interp(a.children[1], env)
+        elif a.typ == '%=':
+            return interp(a.children[0], env) % interp(a.children[1], env)
+        elif a.typ == '^=':
+            return interp(a.children[0], env) ^ interp(a.children[1], env)
+        elif a.typ == '==':
+            return interp(a.children[0], env) == interp(a.children[1], env)
+        elif a.typ == '<=':
+            return interp(a.children[0], env) <= interp(a.children[1], env)
+        elif a.typ == '>=':
+            return interp(a.children[0], env) >= interp(a.children[1], env)
+        elif a.typ == '!=':
+            return interp(a.children[0], env) != interp(a.children[1], env)
+        elif a.typ == '<':
+            return interp(a.children[0], env) < interp(a.children[1], env)
+        elif a.typ == '>':
+            return interp(a.children[0], env) > interp(a.children[1], env)
+        elif a.typ == '!':
+            return not interp(a.children[0], env)
+        elif a.typ == '&&':
+            return interp(a.children[0], env) and interp(a.children[1], env)
+        elif a.typ == '||':
+            return interp(a.children[0], env) or interp(a.children[1], env)
         
     except ZeroDivisionError:
         return 'divide by zero'
