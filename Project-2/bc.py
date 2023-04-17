@@ -247,8 +247,83 @@ def assign(ts: list[token], i: int) -> tuple[ast, int]:
 
     if ts[i].typ == 'var' and i+1 < len(ts) and ts[i+1].typ == 'asg' and ts[i+1].val == '=':
         var_name = ts[i].val
-        rhs, i = neg(ts, i+2)
+        rhs, i = div(ts, i+2)
         return ast('=', ast('var', var_name), rhs), i
+
+    return div(ts, i)
+
+def div(ts: list[token], i: int) -> tuple[ast, int]:
+    """
+    >>> parse('x = true')
+    ast('=', ast('var', 'x'), ast('val', True))
+    >>> parse('a = b = true')
+    ast('=', ast('var', 'a'), ast('=', ast('var', 'b'), ast('val', True)))
+    """
+
+    if i >= len(ts):
+        raise SyntaxError('expected assignment or disjunction, found EOF')
+
+    if ts[i].typ == 'var' and i+1 < len(ts) and ts[i+1].typ == 'opr' and ts[i+1].val == '/':
+        var_name = ts[i].val
+        rhs, i = mul(ts, i+2)
+        return ast('/', ast('var', var_name), rhs), i
+
+    return mul(ts, i)
+
+def mul(ts: list[token], i: int) -> tuple[ast, int]:
+    """
+    >>> parse('x = true')
+    ast('=', ast('var', 'x'), ast('val', True))
+    >>> parse('a = b = true')
+    ast('=', ast('var', 'a'), ast('=', ast('var', 'b'), ast('val', True)))
+    """
+
+    if i >= len(ts):
+        raise SyntaxError('expected assignment or disjunction, found EOF')
+
+    if ts[i].typ == 'var' and i+1 < len(ts) and ts[i+1].typ == 'opr' and ts[i+1].val == '*':
+        var_name = ts[i].val
+        rhs, i = add(ts, i+2)
+        return ast('*', ast('var', var_name), rhs), i
+
+    return add(ts, i)
+
+
+def add(ts: list[token], i: int) -> tuple[ast, int]:
+    """
+    >>> parse('x = true')
+    ast('=', ast('var', 'x'), ast('val', True))
+    >>> parse('a = b = true')
+    ast('=', ast('var', 'a'), ast('=', ast('var', 'b'), ast('val', True)))
+    """
+
+    if i >= len(ts):
+        raise SyntaxError('expected assignment or disjunction, found EOF')
+
+    if ts[i].typ == 'var' and i+1 < len(ts) and ts[i+1].typ == 'opr' and ts[i+1].val == '+':
+        var_name = ts[i].val
+        opr=ts[i+1].val
+        rhs, i = sub(ts, i+2)
+        return ast('+', ast('var', var_name), rhs), i
+
+    return sub(ts, i)
+
+def sub(ts: list[token], i: int) -> tuple[ast, int]:
+    """
+    >>> parse('x = true')
+    ast('=', ast('var', 'x'), ast('val', True))
+    >>> parse('a = b = true')
+    ast('=', ast('var', 'a'), ast('=', ast('var', 'b'), ast('val', True)))
+    """
+
+    if i >= len(ts):
+        raise SyntaxError('expected assignment or disjunction, found EOF')
+
+    if ts[i].typ == 'var' and i+1 < len(ts) and ts[i+1].typ == 'opr' and ts[i+1].val == '-':
+        var_name = ts[i].val
+        opr=ts[i+1].val
+        rhs, i = neg(ts, i+2)
+        return ast('-', ast('var', var_name), rhs), i
 
     return neg(ts, i)
 
@@ -270,6 +345,9 @@ def neg(ts: list[token], i: int) -> tuple[ast, int]:
     else:
         return atom(ts, i)
 
+
+
+
 def atom(ts: list[token], i: int) -> tuple[ast, int]:
     """
     >>> parse('x')
@@ -286,6 +364,8 @@ def atom(ts: list[token], i: int) -> tuple[ast, int]:
         return ast('var', t.val), i+1
     if t.typ == 'int':
         return ast('int', t.val), i+1
+    if t.typ == 'opr':
+        return ast('opr', t.val), i+1
     elif t.typ == 'kw' and t.val in ['true', 'false']:
         return ast('val', t.val == 'true'), i + 1
     elif t.typ == 'sym' and t.val == '(':
@@ -370,7 +450,7 @@ def interp(a: ast, env: set[str]) -> bool:
 
 
 # expr = 'true || false && !x'
-expr = 'x=3'
+expr = 'y=x*3'
 ast = parse(expr)
 print(ast)
 # print(ast.children[0])
