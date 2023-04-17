@@ -235,97 +235,66 @@ def conj(ts: list[token], i: int) -> tuple[ast, int]:
     return lhs, i
 
 def assign(ts: list[token], i: int) -> tuple[ast, int]:
-    """
-    >>> parse('x = true')
-    ast('=', ast('var', 'x'), ast('val', True))
-    >>> parse('a = b = true')
-    ast('=', ast('var', 'a'), ast('=', ast('var', 'b'), ast('val', True)))
-    """
-
+    
     if i >= len(ts):
-        raise SyntaxError('expected assignment or disjunction, found EOF')
+        raise SyntaxError('expected assignment, found EOF')
 
-    if ts[i].typ == 'var' and i+1 < len(ts) and ts[i+1].typ == 'asg' and ts[i+1].val == '=':
-        var_name = ts[i].val
-        rhs, i = div(ts, i+2)
-        return ast('=', ast('var', var_name), rhs), i
+    lhs, i = div(ts,i)
+    if i<len(ts) and ts[i].typ == 'asg' and ts[i].val == '=':
+        rhs, i = div(ts, i+1)
+        lhs =  ast('=', lhs, rhs)
 
-    return div(ts, i)
+    return lhs, i
 
 def div(ts: list[token], i: int) -> tuple[ast, int]:
-    """
-    >>> parse('x = true')
-    ast('=', ast('var', 'x'), ast('val', True))
-    >>> parse('a = b = true')
-    ast('=', ast('var', 'a'), ast('=', ast('var', 'b'), ast('val', True)))
-    """
-
+    
     if i >= len(ts):
-        raise SyntaxError('expected assignment or disjunction, found EOF')
+        raise SyntaxError('expected divisiom, found EOF')
 
-    if ts[i].typ == 'var' and i+1 < len(ts) and ts[i+1].typ == 'opr' and ts[i+1].val == '/':
-        var_name = ts[i].val
-        rhs, i = mul(ts, i+2)
-        return ast('/', ast('var', var_name), rhs), i
+    lhs, i = mul(ts,i)
+    if i<len(ts) and ts[i].typ == 'opr' and ts[i].val == '/':
+        rhs, i = mul(ts, i+1)
+        lhs =  ast('/', lhs, rhs)
 
-    return mul(ts, i)
+    return lhs, i
 
 def mul(ts: list[token], i: int) -> tuple[ast, int]:
-    """
-    >>> parse('x = true')
-    ast('=', ast('var', 'x'), ast('val', True))
-    >>> parse('a = b = true')
-    ast('=', ast('var', 'a'), ast('=', ast('var', 'b'), ast('val', True)))
-    """
-
+    
     if i >= len(ts):
-        raise SyntaxError('expected assignment or disjunction, found EOF')
+        raise SyntaxError('expected multiplication, found EOF')
 
-    if ts[i].typ == 'var' and i+1 < len(ts) and ts[i+1].typ == 'opr' and ts[i+1].val == '*':
-        var_name = ts[i].val
-        rhs, i = add(ts, i+2)
-        return ast('*', ast('var', var_name), rhs), i
+    lhs, i = add(ts,i)
+    if i<len(ts) and ts[i].typ == 'opr' and ts[i].val == '+':
+        rhs, i = add(ts, i+1)
+        lhs =  ast('*', lhs, rhs)
 
-    return add(ts, i)
-
+    return lhs, i
 
 def add(ts: list[token], i: int) -> tuple[ast, int]:
-    """
-    >>> parse('x = true')
-    ast('=', ast('var', 'x'), ast('val', True))
-    >>> parse('a = b = true')
-    ast('=', ast('var', 'a'), ast('=', ast('var', 'b'), ast('val', True)))
-    """
-
+    
     if i >= len(ts):
-        raise SyntaxError('expected assignment or disjunction, found EOF')
+        raise SyntaxError('expected addition, found EOF')
 
-    if ts[i].typ == 'var' and i+1 < len(ts) and ts[i+1].typ == 'opr' and ts[i+1].val == '+':
-        var_name = ts[i].val
-        opr=ts[i+1].val
-        rhs, i = sub(ts, i+2)
-        return ast('+', ast('var', var_name), rhs), i
+    lhs, i = sub(ts,i)
+    if i<len(ts) and ts[i].typ == 'opr' and ts[i].val == '+':
+        rhs, i = sub(ts, i+1)
+        lhs =  ast('+', lhs, rhs)
 
-    return sub(ts, i)
+    return lhs, i
 
 def sub(ts: list[token], i: int) -> tuple[ast, int]:
-    """
-    >>> parse('x = true')
-    ast('=', ast('var', 'x'), ast('val', True))
-    >>> parse('a = b = true')
-    ast('=', ast('var', 'a'), ast('=', ast('var', 'b'), ast('val', True)))
-    """
-
+    
     if i >= len(ts):
-        raise SyntaxError('expected assignment or disjunction, found EOF')
+        raise SyntaxError('expected subtraction, found EOF')
 
-    if ts[i].typ == 'var' and i+1 < len(ts) and ts[i+1].typ == 'opr' and ts[i+1].val == '-':
-        var_name = ts[i].val
-        opr=ts[i+1].val
-        rhs, i = neg(ts, i+2)
-        return ast('-', ast('var', var_name), rhs), i
+    lhs, i = neg(ts,i)
+    if i<len(ts) and ts[i].typ == 'opr' and ts[i].val == '-':
+        rhs, i = neg(ts, i+1)
+        lhs =  ast('-', lhs, rhs)
 
-    return neg(ts, i)
+    return lhs, i
+
+
 
 
 def neg(ts: list[token], i: int) -> tuple[ast, int]:
@@ -450,8 +419,9 @@ def interp(a: ast, env: set[str]) -> bool:
 
 
 # expr = 'true || false && !x'
-expr = 'y=x*3'
+expr = 'x=3/4+1'
 ast = parse(expr)
+
 print(ast)
 # print(ast.children[0])
 # print(ast.children[0].children[0])
