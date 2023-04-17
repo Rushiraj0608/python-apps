@@ -352,14 +352,18 @@ def atom(ts: list[token], i: int) -> tuple[ast, int]:
 
 # INTERPRETER
 
-def interp(a: ast, env: set[str]) -> bool:
+def interp(a: ast, env: set[str]):
     try:
         if a.typ == 'val':
             return a.children[0]
+        elif a.typ == 'int':
+            return int(a.children[0])
         elif a.typ == 'var':
             return a.children[0] in env
         elif a.typ == '!':
             return not interp(a.children[0], env)
+        elif a.typ == '=':
+            return interp(a.children[1], env)
         elif a.typ == '+':
             return interp(a.children[0], env) + interp(a.children[1], env)
         elif a.typ == '-':
@@ -419,9 +423,9 @@ def interp(a: ast, env: set[str]) -> bool:
 
 
 # expr = 'true || false && !x'
-expr = 'x=3/4+1'
+expr = 'x=5/(4+1)'
 ast = parse(expr)
-
+print(interp(ast,{'x'}))
 print(ast)
 # print(ast.children[0])
 # print(ast.children[0].children[0])
