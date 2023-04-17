@@ -57,8 +57,10 @@ def lex(s: str) -> list[token]:
 
             word = s[i:end]
 
-            if word in ['print']:
+            if word == 'print':
                 tokens.append(token('kw', word))
+            if word == 'pi':
+                tokens.append(token('int', 3.14))
             else:
                 tokens.append(token('var', word))
             i = end
@@ -91,6 +93,12 @@ def lex(s: str) -> list[token]:
         elif s[i] == ')':
             tokens.append(token('sym', ')'))
             i += 1
+        elif s[i:i+2] == '++':
+            tokens.append(token('un', '++'))
+            i += 2
+        elif s[i:i+2] == '--':
+            tokens.append(token('un', '--'))
+            i += 2
         elif s[i:i+1] == '+':
             tokens.append(token('opr', '+'))
             i += 1
@@ -109,12 +117,6 @@ def lex(s: str) -> list[token]:
         elif s[i:i+1] == '^':
             tokens.append(token('opr', '^'))
             i += 1
-        elif s[i:i+2] == '++':
-            tokens.append(token('un', '++'))
-            i += 2
-        elif s[i:i+2] == '--':
-            tokens.append(token('un', '--'))
-            i += 2
         elif s[i:i+1] == '=':
             tokens.append(token('asg', '='))
             i += 1
@@ -239,10 +241,58 @@ def assign(ts: list[token], i: int) -> tuple[ast, int]:
     if i >= len(ts):
         raise SyntaxError('expected assignment, found EOF')
 
-    lhs, i = div(ts,i)
+    lhs, i = uninc(ts,i)
     if i<len(ts) and ts[i].typ == 'asg' and ts[i].val == '=':
-        rhs, i = div(ts, i+1)
+        rhs, i = uninc(ts, i+1)
         lhs =  ast('=', lhs, rhs)
+
+    return lhs, i
+
+def uninc(ts: list[token], i: int) -> tuple[ast, int]:
+    
+    if i >= len(ts):
+        raise SyntaxError('expected unary increment, found EOF')
+
+    lhs, i = undec(ts,i)
+
+    while i < len(ts) and ts[i].typ == 'un' and ts[i].val == '++':
+        lhs = ast('++', lhs)
+        i += 1
+
+    return lhs, i
+
+def undec(ts: list[token], i: int) -> tuple[ast, int]:
+    
+    if i >= len(ts):
+        raise SyntaxError('expected unary decrement, found EOF')
+
+    lhs, i = expo(ts,i)
+    while i < len(ts) and ts[i].typ == 'un' and ts[i].val == '--':
+        lhs = ast('--', lhs)
+        i += 1
+    return lhs, i
+
+def expo(ts: list[token], i: int) -> tuple[ast, int]:
+    
+    if i >= len(ts):
+        raise SyntaxError('expected divisiom, found EOF')
+
+    lhs, i = mod(ts,i)
+    if i<len(ts) and ts[i].typ == 'opr' and ts[i].val == '^':
+        rhs, i = mod(ts, i+1)
+        lhs =  ast('^', lhs, rhs)
+
+    return lhs, i
+
+def mod(ts: list[token], i: int) -> tuple[ast, int]:
+    
+    if i >= len(ts):
+        raise SyntaxError('expected divisiom, found EOF')
+
+    lhs, i = div(ts,i)
+    if i<len(ts) and ts[i].typ == 'opr' and ts[i].val == '%':
+        rhs, i = div(ts, i+1)
+        lhs =  ast('%', lhs, rhs)
 
     return lhs, i
 
@@ -287,10 +337,34 @@ def sub(ts: list[token], i: int) -> tuple[ast, int]:
     if i >= len(ts):
         raise SyntaxError('expected subtraction, found EOF')
 
-    lhs, i = neg(ts,i)
+    lhs, i = groreq(ts,i)
     if i<len(ts) and ts[i].typ == 'opr' and ts[i].val == '-':
-        rhs, i = neg(ts, i+1)
+        rhs, i = groreq(ts, i+1)
         lhs =  ast('-', lhs, rhs)
+
+    return lhs, i
+
+def groreq(ts: list[token], i: int) -> tuple[ast, int]:
+    
+    if i >= len(ts):
+        raise SyntaxError('expected greter or equal, found EOF')
+
+    lhs, i = leoreq(ts,i)
+    if i<len(ts) and ts[i].typ == 'relop' and ts[i].val == '>=':
+        rhs, i = leoreq(ts, i+1)
+        lhs =  ast('>=', lhs, rhs)
+
+    return lhs, i
+
+def leoreq(ts: list[token], i: int) -> tuple[ast, int]:
+    
+    if i >= len(ts):
+        raise SyntaxError('expected greter or equal, found EOF')
+
+    lhs, i = neg(ts,i)
+    if i<len(ts) and ts[i].typ == 'relop' and ts[i].val == '<=':
+        rhs, i = neg(ts, i+1)
+        lhs =  ast('<=', lhs, rhs)
 
     return lhs, i
 
@@ -357,7 +431,7 @@ def interp(a: ast, env: set[str]):
         if a.typ == 'val':
             return a.children[0]
         elif a.typ == 'int':
-            return int(a.children[0])
+            return float(a.children[0])
         elif a.typ == 'var':
             return a.children[0] in env
         elif a.typ == '!':
@@ -375,7 +449,7 @@ def interp(a: ast, env: set[str]):
         elif a.typ == '%':
             return interp(a.children[0], env) % interp(a.children[1], env)
         elif a.typ == '^':
-            return interp(a.children[0], env) ^ interp(a.children[1], env)
+            return interp(a.children[0], env) ** interp(a.children[1], env)
         elif a.typ == '--':
             return interp(a.children[0], env)-1
         elif a.typ == '++':
@@ -423,7 +497,7 @@ def interp(a: ast, env: set[str]):
 
 
 # expr = 'true || false && !x'
-expr = 'x=5/(4+1)'
+expr = 'pi+1'
 ast = parse(expr)
 print(interp(ast,{'x'}))
 print(ast)
