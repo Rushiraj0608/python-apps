@@ -17,7 +17,17 @@ for i in range(len(lines)):
             else:
                 lines.remove(lines[i])
 
+input_lines = []
+from collections import defaultdict
+variables = defaultdict(float)
     
+while True:
+    try: 
+        input_lines.append(input())
+    except KeyboardInterrupt:
+        break
+    except EOFError:
+        break
 
 
 class token():
@@ -49,6 +59,8 @@ def lex(s: str) -> list[token]:
     while i < len(s):
         if s[i].isspace():
             i += 1
+        if s[i] == ',':
+            i += 1
         elif s[i].isalpha():
             end = i + 1
             while end < len(s) and (s[end].isalnum() or s[end] == '_'):
@@ -59,7 +71,7 @@ def lex(s: str) -> list[token]:
 
             if word == 'print':
                 tokens.append(token('kw', word))
-            if word == 'pi':
+            elif word == 'pi':
                 tokens.append(token('int', 3.14))
             else:
                 tokens.append(token('var', word))
@@ -200,6 +212,7 @@ def parse(s: str) -> ast:
 
     return a
 
+
 def disj(ts: list[token], i: int) -> tuple[ast, int]:
     """
     >>> parse('true || false')
@@ -235,6 +248,27 @@ def conj(ts: list[token], i: int) -> tuple[ast, int]:
         lhs = ast('&&', lhs, rhs)
 
     return lhs, i
+
+
+# def printer(ts: list[token], i: int) -> tuple[ast, int]:
+#     """
+#     >>> parse('true && false')
+#     ast('&&', ast('val', True), ast('val', False))
+#     >>> parse('!x && (a && !false)')
+#     ast('&&', ast('!', ast('var', 'x')), ast('&&', ast('var', 'a'), ast('!', ast('val', False))))
+#     >>> parse('!x && a && !false')
+#     ast('&&', ast('&&', ast('!', ast('var', 'x')), ast('var', 'a')), ast('!', ast('val', False)))
+#     """
+#     if i >= len(ts):
+#         raise SyntaxError('expected conjunction, found EOF')
+
+#     lhs, i = assign(ts, i)
+
+#     while i < len(ts) and ts[i-1].typ == 'kw' and ts[i-1].val == 'print':
+#         rhs, i = assign(ts, i)
+#         lhs = ast('print', rhs)
+
+#     return lhs, i
 
 def assign(ts: list[token], i: int) -> tuple[ast, int]:
     
@@ -409,6 +443,8 @@ def atom(ts: list[token], i: int) -> tuple[ast, int]:
         return ast('int', t.val), i+1
     if t.typ == 'opr':
         return ast('opr', t.val), i+1
+    # elif t.typ == 'kw' and t.val in ['print']:
+    #     return ast('kw', t.val), i + 1
     elif t.typ == 'kw' and t.val in ['true', 'false']:
         return ast('val', t.val == 'true'), i + 1
     elif t.typ == 'sym' and t.val == '(':
@@ -426,18 +462,31 @@ def atom(ts: list[token], i: int) -> tuple[ast, int]:
 
 # INTERPRETER
 
+def checkIfVar(a: ast, env: set[str]):
+    try:
+        if a.typ == 'var':
+            return (True, a.children[0])
+    except:
+        print("Error occured!")
+
 def interp(a: ast, env: set[str]):
+    global variables
     try:
         if a.typ == 'val':
             return a.children[0]
         elif a.typ == 'int':
             return float(a.children[0])
+        # elif a.typ == 'print':
+        #     print(interp(a.children[0],env))
+        #     return
         elif a.typ == 'var':
-            return a.children[0] in env
+            return variables[a.children[0]]
         elif a.typ == '!':
             return not interp(a.children[0], env)
         elif a.typ == '=':
-            return interp(a.children[1], env)
+            var = checkIfVar(a.children[0], env)
+            if var[0]:
+                variables[var[1]] = interp(a.children[1], env)   
         elif a.typ == '+':
             return interp(a.children[0], env) + interp(a.children[1], env)
         elif a.typ == '-':
@@ -497,10 +546,20 @@ def interp(a: ast, env: set[str]):
 
 
 # expr = 'true || false && !x'
-expr = 'pi+1'
-ast = parse(expr)
-print(interp(ast,{'x'}))
-print(ast)
+for line in input_lines:
+    expr = line
+    if line.strip().startswith('print'):
+        line = line.replace('print',"")
+        pvars= line.split(',')
+        lineResult = ""
+        for pvar in pvars:
+            lineResult = lineResult + str ( interp(parse(pvar),{'x'}) ) + " "
+        print(lineResult.strip())
+    else:
+        result = parse(expr)
+        interp(result,{'x'})
+        print(str(variables))
+        print(result)
 # print(ast.children[0])
 # print(ast.children[0].children[0])
 # print(ast.children[1]) 
@@ -513,3 +572,18 @@ print(ast)
 # print(ast.children[0].children[0])
 # print(ast.children[1].typ)
 # print(ast.children[1].children[0].typ) 
+
+
+# if l = "print ascnao, wefwe, 46884*324523, 32"
+
+# l.trim()
+ 
+# results = [1, ]
+# // print 1, x, 3, 4-5
+# if (l[0:5] === print):
+        # values = [1, x, 3, 4-5]
+        # ast(1,;int ,, x, var)
+#     values = l.split(',')
+#     value -> input
+#     results.append
+    
