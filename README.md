@@ -5,9 +5,6 @@ https://github.com/Rushiraj0608
 
 no known bugs or issues
 
-# resolved issue
-In the **app.py**, Initially I was having an error while deleting invalid post - as in whenever you try to delete post with invalid Id, I was getting an error that says invalid keyword 'user_key' which I was using to delete post with user key. that caused trouble passing all the autograder test cases. After some time I was able to solve that error.
-
 # Implemented extensions
 # 1) Users and user keys 
 route : @app.post("/user")
