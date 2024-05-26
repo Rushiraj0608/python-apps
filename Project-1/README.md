@@ -3,9 +3,6 @@ Rushiraj Herma [rherma@stevens.edu](mailto:rherma@stevens.edu)
 # the URL of your public GitHub repo
 https://github.com/Rushiraj0608
 
-# an estimate of how many hours you spent on the project
-50 hours
-
 # a description of how you tested your code
 These are the steps of how I tested my code:
 Testing with valid input:
@@ -22,12 +19,6 @@ During the testing with incorrect input, the code was checked to ensure that it 
 
 Playing around in terminal:
 Finally, the code was played around with in the terminal to ensure that it was functioning properly in different scenarios.
-
-# bugs and issues
-I am having trouble passing all the autograder test cases. I am passing only eleven test cases. I am not sure what is causing these test cases to fail, I tried but just couldn't figure out.
-
-# resolved issue
-In the **adventure.py** function, Initially I was using end in print function to print the output without generating new line. but because of this at the end of printing line I was having extra space, which made autograder fail my all test cases, after a while of debugging I realized my mistake. And then I used join function of string to get my desired string and then printed that to get accurate answer.
 
 # Implemented extensions ----please use readme file from my gradescope submission, here it changes formate of code I pasted for guidance of these extensions.
 # 1) drop
